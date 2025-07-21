@@ -1,0 +1,12 @@
+# Python Environment
+.venv/
+
+# IDE
+.vscode/
+
+# Engine Builds
+build/
+
+# Engine binaries
+game/*.pdb
+game/**/*.pyd
