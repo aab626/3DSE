@@ -1,45 +1,47 @@
 cmake_minimum_required(VERSION 3.15)
 project(SpaceEngine)
 
+message(STATUS "CMAKE_SOURCE_DIR        : ${CMAKE_SOURCE_DIR}")
+message(STATUS "CMAKE_CURRENT_SOURCE_DIR:${CMAKE_CURRENT_SOURCE_DIR}")
+
 set(Python_INCLUDE_DIRS "C:/Users/a626/AppData/Local/Programs/Python/Python312/Include")
 set(Python_LIBRARIES "C:/Users/a626/projects/space_game/.venv/Lib/site-packages")
 
 # 1. Python Configuration
 set(Python_EXECUTABLE "C:/Users/a626/projects/space_game/.venv/Scripts/python.exe")
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
-include_directories(${Python_INCLUDE_DIRS})
-link_directories(${Python_LIBRARY_DIRS})
 
 # 2. PyBind11 Setup
 list(APPEND CMAKE_PREFIX_PATH "C:/Users/a626/projects/space_game/.venv/Lib/site-packages/pybind11/share/cmake/pybind11")
 find_package(pybind11 REQUIRED)
-include_directories(${pybind11_INCLUDE_DIRS})
 
 # 3. OpenGL Configuration
 find_package(OpenGL REQUIRED)
 
 # 4. Engine Target
-add_library(engine SHARED
-    src/engine.cpp
-    src/GameObject.cpp
-    src/Module.cpp
-    src/modules/RenderModule.cpp
+# Find all .cpp files
+file (GLOB ENGINE_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/**/*.cpp"
 )
 
-# 5. Target Includes (Modern CMake style)
+message(STATUS "ENGINE_SOURCES: ${ENGINE_SOURCES}")
+
+add_library(engine SHARED ${ENGINE_SOURCES})
+
+# 5. Target Includes
 target_include_directories(engine PRIVATE
-    ${CMAKE_SOURCE_DIR}/engine/include
-    ${CMAKE_SOURCE_DIR}/engine/include/modules
+    ${CMAKE_SOURCE_DIR}/include
     ${Python_INCLUDE_DIRS}
     ${pybind11_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
 )
 
-# 6. Target Linking (Updated OpenGL linking)
+# 6. Target Linking
 target_link_libraries(engine PRIVATE 
     pybind11::module
     ${Python_LIBRARIES}
-    ${OPENGL_LIBRARIES}  # This will link opengl32.lib automatically
+    ${OPENGL_LIBRARIES}
 )
 
 # 7. Output Configuration
