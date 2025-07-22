@@ -1,29 +1,30 @@
 #pragma once
-#include "../include/GameObject.hpp"
-
+#include "engine_common.hpp"
+#include "modules/module.hpp"
 #include <vector>
-#include <string>
-// #include <unordered_map>
-// #include <memory>
 
-// GameObject id type shorthand
-typedef signed int id_t;
 
-// Engine class
+constexpr t_id ENGINE_START_ID = 0;
+
 class Engine {
-private:
-    id_t nextGameObjectId;                  // ID for the next game object
-    std::vector<std::string> registeredModules;
+    // Fields
+    private:
+        t_id nextEntityId;
+        std::vector<String> registeredModules;
+
+    // Methods
+    private:
+        Engine();
+
+    public:
+        t_id GetNextId();
+        void RegisterModule(Module* module);
     
-    // std::vector<GameObject> gameObjects;    // Vector of active game objects
+    // Static Methods
+    public:
+        // Singleton constructor and instance retrieval method
+        static Engine* instance;
+        static Engine* GetInstance();
 
-public:
-    Engine() = default;
-
-    void init();
-    void render();
-
-    GameObject createGameObject();
-    void registerModule(std::string moduleName);
-    std::vector<std::string>& getRegisteredModules();
+        static t_id maxInstanceId;
 };

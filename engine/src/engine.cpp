@@ -1,71 +1,77 @@
-// ...existing code...
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#include <pybind11/pybind11.h>
-#include <gl/GL.h>
+#include "engine.hpp"
+#include "engine_common.hpp"
 
-#include "../include/Engine.hpp"
+#include <fmt/core.h>
 
-#include "../include/GameObject.hpp"
-#include "../include/Module.hpp"
-#include "../include/modules/TestModule.hpp"
-
-// #include "../include/modules/RenderModule.hpp"
+#include <limits>
+#include <stdexcept>
+#include <algorithm>
 
 
-namespace py = pybind11;
+// Initialize Engine class variables
+Engine* Engine::instance = nullptr;
+t_id Engine::maxInstanceId = std::numeric_limits<t_id>::max();
 
+// Engine constructor, just sets the instance fields for now
+Engine::Engine()
+: nextEntityId(ENGINE_START_ID) {
 
-void Engine::init() {
-    // Initialize engine vars
-    this->nextGameObjectId = 0;
-
-    // Register modules
-    TestModule testMod(*this, "Test Module");
 }
 
-void Engine::render() {
-    // Rendering logic here
-}
-
-GameObject Engine::createGameObject() {
-    GameObject gameObject = GameObject(*this, nextGameObjectId);
-    nextGameObjectId++;
-    return gameObject;
-}
-
-void Engine::registerModule(std::string moduleName) {
-    for (const auto& registeredModuleName : this->registeredModules) {
-        if (moduleName == registeredModuleName) {
-            throw std::runtime_error("Module already registered: " + moduleName);
-        }
+// Constructor and instance retrieval method for the Engine singleton
+Engine* Engine::GetInstance() {
+    if (!Engine::instance) {
+        Engine::instance = new Engine();
     }
 
-    this->registeredModules.push_back(moduleName);
+    return Engine::instance;
 }
 
-// Getters
-std::vector<std::string>& Engine::getRegisteredModules() {
-    return this->registeredModules;
+// Used to retrieve a Entity ID during creation
+// Also increments the next ID and checks for overflows
+t_id Engine::GetNextId() {
+    if (nextEntityId < Engine::maxInstanceId) {
+        t_id entityId = nextEntityId++;
+        return entityId;
+    } else {
+        String msg = fmt::format("Maximum entity ID reached: {} of {}.", nextEntityId, Engine::maxInstanceId);
+        throw std::runtime_error(msg);
+    }
 }
 
-// Bind C++ engine classes to Python using pybind11 for scripting support.
-PYBIND11_MODULE(engine, m) {
-    py::class_<Engine>(m, "Engine")
-        .def(py::init<>())
-        .def("init", &Engine::init)
-        .def("render", &Engine::render)
-        .def("createGameObject", &Engine::createGameObject);
+// Attemps to register a module into the engine
+void Engine::RegisterModule(Module* module) {
+    // Check if duplicate
+    if (std::find(registeredModules.begin(), registeredModules.end(), module->GetName()) != registeredModules.end()) {
+        String msg = fmt::format("Duplicate module registered: {}.", module->GetName());
+        throw std::runtime_error(msg);
+    }
+
+    registeredModules.push_back(module->GetName());
+}
+
+
+
+// Python binding stuff, commented until usable
+// #include <pybind11/pybind11.h>
+// namespace py = pybind11;
+
+// // Bind C++ engine classes to Python using pybind11 for scripting support.
+// PYBIND11_MODULE(engine, m) {
+//     py::class_<Engine>(m, "Engine")
+//         .def(py::init<>())
+//         .def("init", &Engine::init)
+//         .def("render", &Engine::render)
+//         .def("createGameObject", &Engine::createGameObject);
     
-    py::class_<GameObject>(m, "GameObject")
-        .def("get_id", &GameObject::get_id);
+//     py::class_<GameObject>(m, "GameObject")
+//         .def("get_id", &GameObject::get_id);
         
-    py::class_<Module, std::shared_ptr<Module>>(m, "Module")
-        .def("getName", &Module::getName)
-        .def("update", &Module::update);
+//     py::class_<Module, std::shared_ptr<Module>>(m, "Module")
+//         .def("getName", &Module::getName)
+//         .def("update", &Module::update);
 
-    py::class_<TestModule, Module, std::shared_ptr<TestModule>>(m, "TestModule")
-        .def(py::init<Engine&, std::string&>())
-        .def("update", &TestModule::update);
-}
+//     py::class_<TestModule, Module, std::shared_ptr<TestModule>>(m, "TestModule")
+//         .def(py::init<Engine&, std::string&>())
+//         .def("update", &TestModule::update);
+// }
