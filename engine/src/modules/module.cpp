@@ -3,13 +3,15 @@
 
 // Constructor
 Module::Module(String& name)
-: name(name) {
-}
+: name(name) {}
+
+// Virtual destructor
+Module::~Module() {}
 
 // Registers a module in the engine
-void Module::RegisterModule(Module* module) {
+void Module::RegisterModule() {
     Engine* engine = Engine::GetInstance();
-    engine->RegisterModule(module);
+    engine->RegisterModule(this);
 }
 
 const String& Module::GetName() const {
