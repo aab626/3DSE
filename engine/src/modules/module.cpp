@@ -1,20 +1,14 @@
 #include "modules/module.hpp"
+#include "engine_common.hpp"
 #include "engine.hpp"
 
 // Constructor
-Module::Module(String& name)
-: name(name) {}
+Module::Module(String& name, ModuleType type)
+: name(name), type(type) {}
 
 // Virtual destructor
 Module::~Module() {}
 
-// Registers a module in the engine
-void Module::RegisterModule() {
-    Engine* engine = Engine::GetInstance();
-    engine->RegisterModule(this);
-}
-
 const String& Module::GetName() const {
-    const String& nameRef = name;
-    return nameRef;
+    return name;
 }

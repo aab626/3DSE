@@ -7,6 +7,9 @@
 # Engine Builds
 build/
 
-# Engine binaries
-game/*.pdb
+# Engine binaries and stubs
 game/**/*.pyd
+game/**/*.pyi
+
+# Python bytecode cache
+game/**/*.pyc

@@ -1,18 +1,23 @@
+#pragma once
 #include "modules/module.hpp"
 #include "engine_common.hpp"
 
 // Module that logs information about its entity
 class LoggerModule : public Module {
+// Static fields
+public:
+    static String moduleTypeName;
+    
 // Fields
 // private:
 
 // Constructors and Destructors
 public:
-    LoggerModule(String& name);
-    ~LoggerModule() override;
+  LoggerModule(String& name);
+  ~LoggerModule() override;
 
-    // Override methods
-  public:
-    void init() override;
-    void update() override;
+// Override methods
+public:
+  void init() override;
+  void update() override;
 };

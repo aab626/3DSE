@@ -1,8 +1,13 @@
+#pragma once
 #include "modules/module.hpp"
 #include "engine_common.hpp"
 
 // Module for testing implementation
 class TestModule : public Module {
+// Static fields
+public:
+    static String moduleTypeName;
+
 // Fields
 private:
     int testInt;

@@ -74,7 +74,18 @@ if sys.platform == PLATFORM_WINDOWS:
     subprocess.run(cmake_build_cmd, check=True)
 
     # Copy .pyd file to /game directory
-    shutil.copy(BUILD_DIR / 'Debug' / 'engine.pyd', PROJECT_ROOT / 'game' / 'engine.pyd')
+    shutil.copy(BUILD_DIR / 'Debug' / 'engine_lib.pyd', PROJECT_ROOT / 'game' / 'engine' / 'engine_lib.pyd')
+
+    # Generate .pyi stub files for engine_lib
+    os.chdir(PROJECT_ROOT / 'game' / 'engine')
+    stub_gen_cmd = [
+        'pybind11-stubgen',
+        'engine_lib',
+        '-o', '.'
+    ]
+
+    print('> Running:', ' '.join(stub_gen_cmd))
+    subprocess.run(stub_gen_cmd, check=True)
 
 else:
     print(f'Not implemented build for platform: \"{sys.platform}\"')

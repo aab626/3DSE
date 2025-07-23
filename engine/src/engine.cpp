@@ -40,38 +40,24 @@ t_id Engine::GetNextId() {
 }
 
 // Attemps to register a module into the engine
-void Engine::RegisterModule(Module* module) {
+void Engine::RegisterModuleType(ModuleType type, String& typeName) {
     // Check if duplicate
-    if (std::find(registeredModules.begin(), registeredModules.end(), module->GetName()) != registeredModules.end()) {
-        String msg = fmt::format("Duplicate module registered: {}.", module->GetName());
+    auto it = std::find_if(
+        registeredModuleTypes.begin(), registeredModuleTypes.end(),
+        [type](const std::tuple<ModuleType, String>& tuple) {
+            return std::get<0>(tuple) == type;
+        }
+    );
+
+    // Found duplicate
+    if (it != registeredModuleTypes.end()) {
+        String msg = fmt::format("Duplicate module type registered: {}.", std::get<1>(*it));
         throw std::runtime_error(msg);
     }
 
-    registeredModules.push_back(module->GetName());
+    // Register module type
+    registeredModuleTypes.emplace_back(type, typeName);
 }
 
 
 
-// Python binding stuff, commented until usable
-// #include <pybind11/pybind11.h>
-// namespace py = pybind11;
-
-// // Bind C++ engine classes to Python using pybind11 for scripting support.
-// PYBIND11_MODULE(engine, m) {
-//     py::class_<Engine>(m, "Engine")
-//         .def(py::init<>())
-//         .def("init", &Engine::init)
-//         .def("render", &Engine::render)
-//         .def("createGameObject", &Engine::createGameObject);
-    
-//     py::class_<GameObject>(m, "GameObject")
-//         .def("get_id", &GameObject::get_id);
-        
-//     py::class_<Module, std::shared_ptr<Module>>(m, "Module")
-//         .def("getName", &Module::getName)
-//         .def("update", &Module::update);
-
-//     py::class_<TestModule, Module, std::shared_ptr<TestModule>>(m, "TestModule")
-//         .def(py::init<Engine&, std::string&>())
-//         .def("update", &TestModule::update);
-// }

@@ -1,29 +1,34 @@
 #pragma once
 #include "engine_common.hpp"
 
-class Module {
-// Default constructors
-public:
-    Module() = delete;
+// Module identifiers, each module type should have one unique module type identifier
+enum ModuleType {
+    MODULE_TYPE_BASE = 0, // Should not be used, safe to remove
+    MODULE_TYPE_TEST,
+    MODULE_TYPE_LOGGER,
+    MODULE_TYPE_TRANSFORM
+};
 
-// Fields
+class Module {
+// Instance fields
 private:
     const String name;
+    const ModuleType type;
 
 // Virtual methods
 public:
     virtual ~Module() = 0;
-    
     virtual void init() = 0;
     virtual void update() = 0;
 
-// Methods
+// Instance methods
 protected:
     // Constructor should only be called from derived modules
-    Module(String& name);
+    Module(String &name, ModuleType type);
+
+public:
+    Module() = delete;
     
-    public:
     // Getters
-    const String& GetName() const;
-    void RegisterModule();
+    const String &GetName() const;
 };

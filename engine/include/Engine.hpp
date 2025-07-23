@@ -2,29 +2,31 @@
 #include "engine_common.hpp"
 #include "modules/module.hpp"
 #include <vector>
+#include <tuple>
 
 
 constexpr t_id ENGINE_START_ID = 0;
 
 class Engine {
-    // Fields
-    private:
-        t_id nextEntityId;
-        std::vector<String> registeredModules;
+// Static attributes
+public:
+    static Engine *instance;
+    static t_id maxInstanceId;
 
-    // Methods
-    private:
-        Engine();
+// Static methods
+public:
+    static Engine* GetInstance();
 
-    public:
-        t_id GetNextId();
-        void RegisterModule(Module* module);
-    
-    // Static Methods
-    public:
-        // Singleton constructor and instance retrieval method
-        static Engine* instance;
-        static Engine* GetInstance();
+// Instance fields
+private:
+    t_id nextEntityId;
+    std::vector<std::tuple<ModuleType, String>> registeredModuleTypes;
 
-        static t_id maxInstanceId;
+// Instance methods
+private:
+    Engine();
+
+public:
+    t_id GetNextId();
+    void RegisterModuleType(ModuleType type, String& typeName);
 };
